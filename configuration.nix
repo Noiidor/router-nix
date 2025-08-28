@@ -4,6 +4,8 @@
   pkgs,
   ...
 }: let
+  internal = "10.0.0.1";
+
   wan = "enp2s0";
   lan = "lan-br";
 in {
@@ -147,7 +149,7 @@ in {
         bridgeConfig = {};
         linkConfig.RequiredForOnline = "carrier";
         address = [
-          "192.168.10.1/24"
+          "${internal}/24"
         ];
         networkConfig = {
           ConfigureWithoutCarrier = true;
@@ -155,13 +157,13 @@ in {
           DHCPPrefixDelegation = true;
         };
         # dhcpServerConfig = {
-        #   DNS = "192.168.10.1";
-        #   NTP = "192.168.10.1";
+        #   DNS = internal;
+        #   NTP = internal
         #   EmitDNS = true;
         #   EmitNTP = true;
         #   EmitRouter = true;
         #   EmitTimezone = true;
-        #   ServerAddress = "192.168.10.1/24";
+        #   ServerAddress = "${internal}/24";
         #   UplinkInterface = "enp1s0";
         # };
         dhcpPrefixDelegationConfig = {
@@ -212,16 +214,16 @@ in {
       no-resolv = true;
 
       cache-size = 1000;
-      dhcp-range = ["${lan},192.168.10.50,192.168.10.254,24h"];
+      dhcp-range = ["${lan},10.0.0.50,10.0.0.200,24h"];
       interface = "${lan}";
-      dhcp-host = "192.168.10.1";
+      dhcp-host = internal;
 
       local = "/lan/";
       domain = "lan";
       expand-hosts = true;
 
       no-hosts = true;
-      address = "/surfer.lan/192.168.10.1";
+      address = "/surfer.lan/${internal}";
     };
   };
 
