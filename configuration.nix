@@ -52,6 +52,7 @@ in {
     btop
     tmux
     rsync
+    iperf3
   ];
 
   programs = {
