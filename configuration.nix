@@ -229,5 +229,11 @@ in {
 
   systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
 
+  nix = {
+    settings = {
+      experimental-features = ["nix-command" "flakes"];
+    };
+  };
+
   system.stateVersion = "25.05";
 }
