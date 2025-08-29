@@ -29,7 +29,6 @@ in {
       };
     };
   };
-  # networking.
 
   time.timeZone = "Europe/Moscow";
 
@@ -78,10 +77,9 @@ in {
     enable = true;
     settings = {
       PasswordAuthentication = false;
+      PermitRootLogin = "no";
     };
   };
-
-  services.resolved.enable = false;
 
   networking = {
     hostName = "router";
@@ -90,17 +88,10 @@ in {
     useDHCP = false;
     dhcpcd.enable = false;
 
+    # Disables default firewall
     nat.enable = false;
     firewall.enable = false;
 
-    # firewall.allowedTCPPorts = [
-    #   22 # SSH
-    # ];
-    # firewall.allowedUDPPorts = [
-    #   67 # DHCP
-    #   68 # DHCP
-    # ];
-    #
     nftables = {
       enable = true;
       ruleset = ''
@@ -132,6 +123,7 @@ in {
     };
   };
 
+  # Using systemd-networkd as a network backend
   systemd.network = {
     enable = true;
     wait-online.anyInterface = true;
@@ -184,7 +176,7 @@ in {
 
       "10-${wan}" = {
         matchConfig.Name = wan;
-        linkConfig.RequiredForOnline = "carrier";
+        linkConfig.RequiredForOnline = "routable";
         networkConfig = {
           IPv4Forwarding = true;
           DHCP = "yes";
@@ -205,11 +197,15 @@ in {
     };
   };
 
+  # Using dnsmasq as a DNS and DHCP server
+  # NOTE: consider using systemd DHCP
+  services.resolved.enable = false;
   services.dnsmasq = {
     enable = true;
     settings = {
       server = ["8.8.8.8" "1.1.1.1" "8.8.4.4"];
       domain-needed = true;
+      # Blocks DNS queries to common internal ip ranges(10.0.0.0/8, 192.168.0.0/16)
       bogus-priv = true;
       no-resolv = true;
 
@@ -227,7 +223,8 @@ in {
     };
   };
 
-  systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
+  # For debugging
+  # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
 
   nix = {
     settings = {
