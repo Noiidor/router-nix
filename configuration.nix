@@ -73,11 +73,24 @@ in {
     };
   };
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "no";
+  services = {
+    openssh = {
+      enable = true;
+      allowSFTP = false;
+      ports = [22];
+      settings = {
+        LogLevel = "VERBOSE";
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
+        PermitRootLogin = "no";
+      };
+    };
+
+    fail2ban = {
+      enable = true;
+      maxretry = 5;
+      bantime = "1d";
+      bantime-increment.enable = true;
     };
   };
 
