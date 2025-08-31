@@ -11,6 +11,7 @@
 in {
   imports = [
     ./hardware-configuration.nix
+    ./telemetry.nix
   ];
 
   boot = {
