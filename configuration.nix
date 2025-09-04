@@ -217,7 +217,11 @@ in {
   services.dnsmasq = {
     enable = true;
     settings = {
-      server = ["8.8.8.8" "1.1.1.1" "8.8.4.4"];
+      server = [
+        "9.9.9.9"
+        "1.1.1.1"
+        "8.8.4.4"
+      ];
       domain-needed = true;
       # Blocks DNS queries to common internal ip ranges(10.0.0.0/8, 192.168.0.0/16)
       bogus-priv = true;

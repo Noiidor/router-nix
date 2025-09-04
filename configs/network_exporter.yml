@@ -1,6 +1,8 @@
 # General
 conf:
   refresh: 15m
+  nameserver: 10.0.0.1:53 # Optional
+  nameserver_timeout: 250ms # Optional
 # Specific Protocol settings
 icmp:
   interval: 5s
@@ -22,14 +24,14 @@ targets:
   - name: internal
     host: localhost
     type: ICMP+MTR
-  - name: google-dns1
-    host: 8.8.8.8
-    type: ICMP+MTR
   - name: google-dns2
     host: 8.8.4.4
     type: ICMP+MTR
   - name: cloudflare-dns
     host: 1.1.1.1
+    type: ICMP+MTR
+  - name: quad9-dns
+    host: 9.9.9.9
     type: ICMP+MTR
   - name: vkontakte
     host: vk.com
