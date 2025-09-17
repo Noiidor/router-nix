@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "id": 3,
+  "id": 4,
   "links": [],
   "panels": [
     {
@@ -427,7 +427,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "last_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"sd\"}[$__rate_interval])",
+          "expr": "avg without (target_ip) (last_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"sd\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "SD",
           "range": true,
@@ -438,7 +438,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"usd\" }[$__rate_interval])",
+          "expr": "avg without (target_ip) (last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"usd\" }[$__rate_interval]))",
           "interval": "",
           "legendFormat": "USD",
           "range": true,
@@ -449,7 +449,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"csd\" }[$__rate_interval])",
+          "expr": "avg without (target_ip) (last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"csd\" }[$__rate_interval]))",
           "interval": "",
           "legendFormat": "CSD",
           "range": true,
@@ -460,7 +460,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"range\" }[$__rate_interval])",
+          "expr": "avg without (target_ip) (last_over_time(ping_rtt_seconds{host=~\"$station\",name=~\"$name_icmp\", type=\"range\" }[$__rate_interval]))",
           "interval": "",
           "legendFormat": "RANGE",
           "range": true,
@@ -898,7 +898,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "min_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"best\"}[$__interval])",
+          "expr": "avg without (target_ip) (min_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"best\"}[$__interval]))",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
@@ -911,7 +911,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"mean\"}[$__interval])",
+          "expr": "avg without (target_ip) (avg_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"mean\"}[$__interval]))",
           "hide": false,
           "instant": false,
           "interval": "",
@@ -923,7 +923,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "max_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"worst\"}[$__interval])",
+          "expr": "avg without (target_ip) (max_over_time(ping_rtt_seconds{host=~\"$station\", name=~\"$name_icmp\", type=\"worst\"}[$__interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "worst",
@@ -935,7 +935,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "ping_loss_percent{host=~\"$station\",name=~\"$name_icmp\"}",
+          "expr": "avg without (target_ip) (ping_loss_percent{host=~\"$station\",name=~\"$name_icmp\"})",
           "interval": "",
           "legendFormat": "loss",
           "range": true,
@@ -1197,7 +1197,8 @@
           "datasource": {
             "uid": "$datasource"
           },
-          "expr": "ping_loss_percent{host=~\"$station\"} < 100 > 0",
+          "editorMode": "code",
+          "expr": "avg without (target_ip) (ping_loss_percent{host=~\"$station\"} < 100 > 0)",
           "instant": false,
           "interval": "",
           "legendFormat": "{{name}}",
@@ -1299,9 +1300,11 @@
           "datasource": {
             "uid": "$datasource"
           },
+          "editorMode": "code",
           "expr": "ping_loss_percent{name=~\"$name_icmp\"}",
           "interval": "",
-          "legendFormat": "{{host}}",
+          "legendFormat": "{{name}} {{target_ip}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -3464,5 +3467,5 @@
   "timezone": "",
   "title": "Network",
   "uid": "GGIdNh9Wz",
-  "version": 13
+  "version": 1
 }
