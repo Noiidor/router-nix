@@ -227,7 +227,7 @@ in {
       bogus-priv = true;
       no-resolv = true;
 
-      cache-size = 1000;
+      cache-size = 2000;
       dhcp-range = ["${lan},10.0.0.50,10.0.0.200,24h"];
       interface = "${lan}";
       dhcp-host = internal;
