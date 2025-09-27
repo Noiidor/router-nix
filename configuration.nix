@@ -215,7 +215,7 @@ in {
   # NOTE: consider using systemd DHCP
   services.resolved.enable = false;
   services.dnsmasq = {
-    enable = true;
+    enable = false;
     settings = {
       server = [
         "9.9.9.9"
@@ -238,6 +238,46 @@ in {
 
       no-hosts = true;
       address = "/surfer.lan/${internal}";
+    };
+  };
+
+  # DHCP Server
+  services.kea.dhcp4 = {
+    enable = true;
+    settings = {
+      interfaces-config.interfaces = [lan];
+      rebind-timer = 2000;
+      renew-timer = 1000;
+      valid-lifetime = 4000;
+
+      subnet4 = [
+        {
+          id = 1;
+          subnet = "${internal}/24";
+          pools = [{pool = "10.0.0.50 - 10.0.0.200";}];
+
+          # This announces router as a default gateway
+          option-data = [
+            {
+              name = "routers";
+              data = internal;
+            }
+          ];
+        }
+      ];
+
+      lease-database = {
+        name = "/var/lib/kea/kea-leases4.csv";
+        type = "memfile";
+        lfc-interval = 3600;
+      };
+
+      loggers = [
+        {
+          name = "*";
+          severity = "DEBUG";
+        }
+      ];
     };
   };
 
