@@ -3,17 +3,20 @@
   pkgs,
   ...
 }: let
+  networkExporter = pkgs.callPackage ./packages/network_exporter.nix {};
+  networkExporterPort = 9428;
+
   # TODO: Rewrire as a module
   # Packages a Go iperf3_exporter utility
   iPerf3Exporter = pkgs.callPackage ./packages/iperf3_exporter.nix {};
   iPerf3ExporterPort = 9579;
-
-  networkExporter = pkgs.callPackage ./packages/network_exporter.nix {};
-  networkExporterPort = 9428;
 in {
   environment.systemPackages = [
-    iPerf3Exporter
     networkExporter
+    iPerf3Exporter
+
+    # (pkgs.callPackage ./packages/iperf3_exporter.nix {})
+    # (pkgs.callPackage ./packages/network_exporter.nix {})
   ];
 
   # Prometheus

@@ -3,14 +3,12 @@
   lib,
   pkgs,
   ...
-}: let
-  internal = "10.0.0.1";
-
-  wan = "enp2s0";
-  lan = "lan-br";
-in {
+}: {
   imports = [
     ./hardware-configuration.nix
+    ./variables.nix
+    ./dns.nix
+    ./dhcp.nix
     ./telemetry.nix
   ];
 
@@ -25,8 +23,8 @@ in {
 
         # Discards Martian packets
         "net.ipv4.conf.default.rp_filter" = 1;
-        "net.ipv4.conf.${wan}.rp_filter" = 1;
-        "net.ipv4.conf.${lan}.rp_filter" = 0;
+        "net.ipv4.conf.${config.wan}.rp_filter" = 1;
+        "net.ipv4.conf.${config.lan}.rp_filter" = 0;
       };
     };
   };
@@ -99,12 +97,16 @@ in {
     hostName = "router";
     # wireless.enable = true;  # Enables wireless support via wpa_supplicant.
     useNetworkd = true;
+
+    # Using custom DHCP
     useDHCP = false;
     dhcpcd.enable = false;
 
     # Disables default firewall
     nat.enable = false;
     firewall.enable = false;
+
+    nameservers = ["127.0.0.1" "::1"];
 
     nftables = {
       enable = true;
@@ -113,24 +115,24 @@ in {
           chain input {
             type filter hook input priority 0; policy drop;
 
-            iifname { "${lan}" } accept comment "Allow local network to access the router"
-            iifname "${wan}" ct state { established, related } accept comment "Allow established traffic"
-            iifname "${wan}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
-            iifname "${wan}" counter drop comment "Drop all other unsolicited traffic from wan"
+            iifname { "${config.lan}" } accept comment "Allow local network to access the router"
+            iifname "${config.wan}" ct state { established, related } accept comment "Allow established traffic"
+            iifname "${config.wan}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
+            iifname "${config.wan}" counter drop comment "Drop all other unsolicited traffic from wan"
             iifname "lo" accept comment "Accept everything from loopback interface"
           }
           chain forward {
             type filter hook forward priority filter; policy drop;
 
-            iifname { "${lan}" } oifname { "${wan}" } accept comment "Allow trusted LAN to WAN"
-            iifname { "${wan}" } oifname { "${lan}" } ct state { established, related } accept comment "Allow established back to LANs"
+            iifname { "${config.lan}" } oifname { "${config.wan}" } accept comment "Allow trusted LAN to WAN"
+            iifname { "${config.wan}" } oifname { "${config.lan}" } ct state { established, related } accept comment "Allow established back to LANs"
           }
         }
 
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
-            oifname "${wan}" masquerade
+            oifname "${config.wan}" masquerade
           }
         }
       '';
@@ -142,40 +144,29 @@ in {
     enable = true;
     wait-online.anyInterface = true;
     netdevs = {
-      "20-${lan}" = {
+      "20-${config.lan}" = {
         netdevConfig = {
           Kind = "bridge";
-          Name = lan;
+          Name = config.lan;
         };
       };
     };
     networks = {
-      "30-${lan}" = {
-        matchConfig.Name = lan;
+      "30-${config.lan}" = {
+        matchConfig.Name = config.lan;
         bridgeConfig = {};
         linkConfig.RequiredForOnline = "carrier";
         address = [
-          "${internal}/24"
+          "${config.internal}/24"
         ];
         networkConfig = {
           ConfigureWithoutCarrier = true;
-          # DHCPServer = true;
           DHCPPrefixDelegation = true;
         };
-        # dhcpServerConfig = {
-        #   DNS = internal;
-        #   NTP = internal
-        #   EmitDNS = true;
-        #   EmitNTP = true;
-        #   EmitRouter = true;
-        #   EmitTimezone = true;
-        #   ServerAddress = "${internal}/24";
-        #   UplinkInterface = "enp1s0";
-        # };
         dhcpPrefixDelegationConfig = {
           Announce = true;
           SubnetId = 1;
-          UplinkInterface = wan;
+          UplinkInterface = config.wan;
         };
       };
 
@@ -183,13 +174,13 @@ in {
         matchConfig.Name = "enp1s0";
         linkConfig.RequiredForOnline = "enslaved";
         networkConfig = {
-          Bridge = lan;
+          Bridge = config.lan;
           ConfigureWithoutCarrier = true;
         };
       };
 
-      "10-${wan}" = {
-        matchConfig.Name = wan;
+      "10-${config.wan}" = {
+        matchConfig.Name = config.wan;
         linkConfig.RequiredForOnline = "routable";
         networkConfig = {
           IPv4Forwarding = true;
@@ -211,76 +202,7 @@ in {
     };
   };
 
-  # Using dnsmasq as a DNS and DHCP server
-  # NOTE: consider using systemd DHCP
-  services.resolved.enable = false;
-  services.dnsmasq = {
-    enable = false;
-    settings = {
-      server = [
-        "9.9.9.9"
-        "1.1.1.1"
-        "8.8.4.4"
-      ];
-      domain-needed = true;
-      # Blocks DNS queries to common internal ip ranges(10.0.0.0/8, 192.168.0.0/16)
-      bogus-priv = true;
-      no-resolv = true;
-
-      cache-size = 2000;
-      dhcp-range = ["${lan},10.0.0.50,10.0.0.200,24h"];
-      interface = "${lan}";
-      dhcp-host = internal;
-
-      local = "/lan/";
-      domain = "lan";
-      expand-hosts = true;
-
-      no-hosts = true;
-      address = "/surfer.lan/${internal}";
-    };
-  };
-
   # DHCP Server
-  services.kea.dhcp4 = {
-    enable = true;
-    settings = {
-      interfaces-config.interfaces = [lan];
-      rebind-timer = 2000;
-      renew-timer = 1000;
-      valid-lifetime = 4000;
-
-      subnet4 = [
-        {
-          id = 1;
-          subnet = "${internal}/24";
-          pools = [{pool = "10.0.0.50 - 10.0.0.200";}];
-
-          # This announces router as a default gateway
-          option-data = [
-            {
-              name = "routers";
-              data = internal;
-            }
-          ];
-        }
-      ];
-
-      lease-database = {
-        name = "/var/lib/kea/kea-leases4.csv";
-        type = "memfile";
-        lfc-interval = 3600;
-      };
-
-      loggers = [
-        {
-          name = "*";
-          severity = "DEBUG";
-        }
-      ];
-    };
-  };
-
   # For debugging
   # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
 
