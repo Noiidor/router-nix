@@ -60,6 +60,16 @@ in {
           }
         ];
       }
+
+      {
+        job_name = "blocky_exporter";
+        scrape_timeout = "20s";
+        static_configs = [
+          {
+            targets = ["localhost:${toString config.blockyApiPort}"];
+          }
+        ];
+      }
     ];
   };
 
@@ -108,6 +118,10 @@ in {
         http_port = 3000;
         enable_gzip = true;
       };
+      panels = {
+        # Allows scripts in text panels. Warning: enables XSS vulnerabilities
+        disable_sanitize_html = true;
+      };
     };
 
     provision = {
@@ -138,4 +152,5 @@ in {
 
   environment.etc."grafana-dashboards/node-exporter-full.json".source = ./dashboards/node-exporter-full.json;
   environment.etc."grafana-dashboards/network-exporters.json".source = ./dashboards/network-exporters.json;
+  environment.etc."grafana-dashboards/blocky-grafana.json".source = ./dashboards/blocky-grafana.json;
 }

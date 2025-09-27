@@ -1,10 +1,11 @@
-{...}: {
+{config, ...}: {
   services.blocky = {
     enable = true;
     settings = {
       ports = {
         dns = 53;
         tls = 853;
+        http = config.blockyApiPort; # Prom metrics, pprof, API
         https = 443;
       };
 
