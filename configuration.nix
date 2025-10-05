@@ -53,6 +53,7 @@
     tmux
     rsync
     iperf3
+    tcpdump
   ];
 
   programs = {

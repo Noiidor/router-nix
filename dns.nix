@@ -41,8 +41,8 @@
           refreshPeriod = "24h";
           strategy = "fast";
           downloads = {
-            attempts = 3;
-            cooldown = "10s";
+            attempts = 4;
+            cooldown = "30s";
             timeout = "5m";
           };
         };
