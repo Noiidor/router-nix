@@ -34,7 +34,7 @@
         disable_cache = true;
       };
       route = {
-        final = "vless-out"; # Send trafic directly by default
+        final = "direct-out"; # Send trafic directly by default
         auto_detect_interface = true;
         find_process = true;
 
@@ -57,15 +57,16 @@
           #   protocol = "dns";
           #   action = "hijack-dns";
           # }
-          # {
-          #   # Proxy only blocked resources
-          #   rule_set = [
-          #     "geoip-ru-blocked"
-          #     "geosite-ru-blocked"
-          #   ];
-          #   action = "route";
-          #   outbound = "vless-out";
-          # }
+          {
+            # Proxy only blocked resources
+            rule_set = [
+              "geoip-ru-blocked"
+              "geosite-ru-blocked"
+              "geoip-ru-itdog-blocked"
+            ];
+            action = "route";
+            outbound = "vless-out";
+          }
           {
             protocol = "bittorrent";
             action = "route";
@@ -100,6 +101,13 @@
             format = "binary";
             download_detour = "vless-out";
             url = "https://testingcf.jsdelivr.net/gh/runetfreedom/russia-v2ray-rules-dat@release/sing-box/rule-set-geosite/geosite-ru-blocked.srs";
+          }
+          {
+            tag = "geoip-ru-itdog-blocked";
+            type = "remote";
+            format = "binary";
+            download_detour = "vless-out";
+            url = "https://github.com/itdoginfo/allow-domains/releases/latest/download/russia_inside.srs";
           }
         ];
       };
