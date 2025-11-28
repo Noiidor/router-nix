@@ -1,7 +1,7 @@
 {
   config,
-  lib,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
@@ -9,7 +9,9 @@
     ./variables.nix
     ./dns.nix
     ./dhcp.nix
+    ./agenix.nix
     ./telemetry.nix
+    ./sing-box.nix
   ];
 
   boot = {
@@ -54,6 +56,8 @@
     rsync
     iperf3
     tcpdump
+    dig
+    inputs.agenix.packages.x86_64-linux.default
   ];
 
   programs = {
@@ -209,7 +213,12 @@
 
   nix = {
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      trusted-users = ["noi"];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+        "pipe-operators"
+      ];
     };
   };
 
