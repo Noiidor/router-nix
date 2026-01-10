@@ -30,6 +30,7 @@
 
       customDNS.mapping = {
         "router.local" = "10.0.0.1";
+        "dev.climate.local" = "10.0.0.57";
       };
 
       blocking = {

@@ -38,6 +38,14 @@ in {
         ];
       }
       {
+        job_name = "climate";
+        static_configs = [
+          {
+            targets = ["dev.climate.local:8001"];
+          }
+        ];
+      }
+      {
         job_name = "iperf3_exporter";
         scrape_timeout = "20s";
         metrics_path = "/probe";

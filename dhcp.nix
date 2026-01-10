@@ -30,6 +30,10 @@
         }
       ];
 
+      expired-leases-processing = {
+        hold-reclaimed-time = 360000;
+      };
+
       lease-database = {
         name = "/var/lib/kea/kea-leases4.csv";
         type = "memfile";

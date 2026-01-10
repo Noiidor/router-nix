@@ -72,12 +72,12 @@
             action = "route";
             outbound = "direct-out";
           }
-          {
-            network = "udp";
-            source_port = [53];
-            action = "route";
-            outbound = "direct-out";
-          }
+          # {
+          #   network = "udp";
+          #   source_port = [53];
+          #   action = "route";
+          #   outbound = "direct-out";
+          # }
         ];
 
         rule_set = [
@@ -155,11 +155,29 @@
             "127.0.0.0/8"
             "10.0.0.0/8"
             "9.9.9.9/32"
+
+            "46.226.122.0/24"
+            "91.212.64.0/24"
+            "91.223.93.0/24"
+            "185.73.192.0/22"
+            "195.34.20.0/23"
           ];
           auto_route = true;
           auto_redirect = true;
           strict_route = true;
           mtu = 1500;
+        }
+        {
+          tag = "socks-in";
+          type = "socks";
+          listen = "0.0.0.0";
+          listen_port = 3080;
+        }
+        {
+          tag = "http-in";
+          type = "http";
+          listen = "0.0.0.0";
+          listen_port = 2080;
         }
       ];
       certificate = {
