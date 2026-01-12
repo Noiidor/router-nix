@@ -161,4 +161,5 @@ in {
   environment.etc."grafana-dashboards/node-exporter-full.json".source = ./dashboards/node-exporter-full.json;
   environment.etc."grafana-dashboards/network-exporters.json".source = ./dashboards/network-exporters.json;
   environment.etc."grafana-dashboards/blocky-grafana.json".source = ./dashboards/blocky-grafana.json;
+  environment.etc."grafana-dashboards/climate.json".source = ./dashboards/climate.json;
 }
