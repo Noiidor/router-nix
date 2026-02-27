@@ -12,6 +12,7 @@
     ./agenix.nix
     ./telemetry.nix
     ./sing-box.nix
+    ./services.nix
   ];
 
   boot = {

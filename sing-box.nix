@@ -34,7 +34,7 @@
         disable_cache = true;
       };
       route = {
-        final = "direct-out"; # Send trafic directly by default
+        final = "vless-out"; # Send trafic directly by default
         auto_detect_interface = true;
         find_process = true;
 

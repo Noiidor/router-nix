@@ -3,7 +3,11 @@
   services.kea.dhcp4 = {
     enable = true;
     settings = {
-      interfaces-config.interfaces = [config.lan];
+      interfaces-config = {
+        interfaces = [config.lan];
+        service-sockets-max-retries = 10;
+        service-sockets-retry-wait-time = 5000;
+      };
       rebind-timer = 2000;
       renew-timer = 1000;
       valid-lifetime = 4000;

@@ -41,7 +41,10 @@ in {
         job_name = "climate";
         static_configs = [
           {
-            targets = ["dev.climate.local:8001"];
+            targets = [
+              "dev.climate.local:8001"
+              "10.0.0.59:8001"
+            ];
           }
         ];
       }
