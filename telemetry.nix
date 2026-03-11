@@ -23,6 +23,10 @@ in {
   services.prometheus = {
     enable = true;
 
+    extraFlags = [
+      "--web.enable-admin-api"
+    ];
+
     globalConfig = {
       scrape_interval = "30s";
     };
