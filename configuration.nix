@@ -13,6 +13,7 @@
     ./telemetry.nix
     ./sing-box.nix
     ./services.nix
+    ./home-assistant.nix
   ];
 
   boot = {
