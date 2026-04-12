@@ -17,7 +17,7 @@
         extraOptions = [
           "--network=host"
           "--device=/dev/ttyUSB0:/dev/ttyUSB0"
-          "--pull=always"
+          # "--pull=always"
         ];
       };
     };
