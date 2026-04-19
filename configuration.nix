@@ -11,9 +11,9 @@
     ./dhcp.nix
     ./agenix.nix
     ./telemetry.nix
-    ./sing-box.nix
     ./services.nix
     ./home-assistant.nix
+    ./xray.nix
   ];
 
   boot = {
@@ -155,6 +155,17 @@
         netdevConfig = {
           Kind = "bridge";
           Name = config.lan;
+          Description = "LAN bridge";
+        };
+      };
+      "20-${config.lan}.20" = {
+        netdevConfig = {
+          Kind = "vlan";
+          Name = "${config.lan}.20";
+          Description = "VLAN interface which skips proxy pipeline";
+        };
+        vlanConfig = {
+          Id = 20;
         };
       };
     };
@@ -175,6 +186,9 @@
           SubnetId = 1;
           UplinkInterface = config.wan;
         };
+        vlan = [
+          "${config.lan}.20"
+        ];
       };
 
       "30-enp1s0" = {
@@ -205,6 +219,14 @@
         #   Announce = false;
         #   SubnetId = 0;
         # };
+      };
+
+      "40-${config.lan}.20" = {
+        matchConfig.Name = "${config.lan}.20";
+        networkConfig = {
+          DHCP = "no";
+        };
+        address = ["10.0.1.20/24"];
       };
     };
   };
