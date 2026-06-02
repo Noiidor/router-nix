@@ -47,7 +47,6 @@ in {
           {
             targets = [
               "dev.climate.local:8001"
-              "10.0.0.59:8001"
             ];
           }
         ];

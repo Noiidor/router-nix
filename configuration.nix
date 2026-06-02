@@ -14,6 +14,7 @@
     ./services.nix
     ./home-assistant.nix
     ./xray.nix
+    ./navidrome.nix
   ];
 
   boot = {
@@ -133,6 +134,8 @@
 
             iifname { "${config.lan}" } oifname { "${config.wan}" } accept comment "Allow trusted LAN to WAN"
             iifname { "${config.wan}" } oifname { "${config.lan}" } ct state { established, related } accept comment "Allow established back to LANs"
+            iifname "${config.lan}" oifname "xray0" accept comment "Allow LAN to xray tunnel"
+            iifname "xray0" oifname "${config.lan}" ct state { established, related } accept comment "Allow established from xray back to LANs"
           }
         }
 
@@ -186,9 +189,20 @@
           SubnetId = 1;
           UplinkInterface = config.wan;
         };
-        vlan = [
-          "${config.lan}.20"
-        ];
+        # routingPolicyRules = [
+        #   {
+        #     From = "10.0.0.1";
+        #     Table = 253;
+        #     Priority = 100;
+        #   }
+        #   {
+        #     From = "10.0.0.0/24";
+        #     Table = 10;
+        #   }
+        # ];
+        # vlan = [
+        #   "${config.lan}.20"
+        # ];
       };
 
       "30-enp1s0" = {
@@ -208,17 +222,7 @@
           DHCP = "yes";
           DNSOverTLS = true;
           DNSSEC = true;
-          # DHCPPrefixDelegation = true;
         };
-        # dhcpV4Config = {
-        #   UseDNS = false;
-        #   UseRoutes = true;
-        # };
-        # dhcpPrefixDelegationConfig = {
-        #   UplinkInterface = ":self";
-        #   Announce = false;
-        #   SubnetId = 0;
-        # };
       };
 
       "40-${config.lan}.20" = {
