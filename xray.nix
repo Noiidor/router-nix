@@ -67,12 +67,12 @@
           };
         }
       ];
-      outbounds = [
-        {
-          tag = "vless-out";
+      outbounds = let
+        vlessBase = idx: addrPath: sni: {
+          tag = "vless-out-${toString idx}";
           protocol = "vless";
           settings = {
-            address._secret = config.age.secrets.xray-vless-server.path;
+            address._secret = addrPath;
             port = 443;
             id._secret = config.age.secrets.xray-vless-uuid.path;
             encryption = "none";
@@ -82,14 +82,17 @@
             network = "raw";
             security = "reality";
             realitySettings = {
-              serverName = "blocket.se";
+              serverName = sni;
               password._secret = config.age.secrets.xray-reality-password.path;
               shortId._secret = config.age.secrets.xray-reality-short-id.path;
               fingerprint = "firefox";
               show = true;
             };
           };
-        }
+        };
+      in [
+        (vlessBase 1 config.age.secrets.xray-vless-server.path "blocket.se")
+        (vlessBase 2 config.age.secrets.xray-vless-server1.path "antenne.de")
         {
           tag = "direct-out";
           protocol = "freedom";
@@ -99,7 +102,27 @@
           protocol = "blackhole";
         }
       ];
+      burstObservatory = {
+        subjectSelector = ["vless-out-"];
+        pingConfig = {
+          destination = "https://connectivitycheck.gstatic.com/generate_204";
+          sampling = 5;
+          interval = "1m";
+          timeout = "5s";
+          httpMethod = "HEAD";
+        };
+      };
       routing = {
+        balancers = [
+          {
+            tag = "vless-bl";
+            selector = ["vless-out-"];
+            fallbackTag = "direct-out";
+            strategy = {
+              type = "random";
+            };
+          }
+        ];
         domainStrategy = "IPIfNonMatch";
         rules = [
           {
@@ -116,6 +139,10 @@
             type = "field";
             ip = ["geoip:private"];
             outboundTag = "direct-out";
+          }
+          {
+            inboundTag = "socks-in";
+            balancerTag = "vless-bl";
           }
         ];
       };

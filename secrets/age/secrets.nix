@@ -8,6 +8,7 @@ in {
   "sing-box-vless-server.age".publicKeys = allHosts;
 
   "xray-vless-server.age".publicKeys = allHosts;
+  "xray-vless-server1.age".publicKeys = allHosts;
   "xray-vless-uuid.age".publicKeys = allHosts;
   "xray-reality-short-id.age".publicKeys = allHosts;
   "xray-reality-password.age".publicKeys = allHosts;
