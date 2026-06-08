@@ -77,8 +77,8 @@
             "https://v.firebog.net/hosts/Prigent-Malware.txt"
           ];
           other = [
-            "https://big.oisd.nl/domainswild"
-            "https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser"
+            # "https://big.oisd.nl/domainswild"
+            # "https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser"
           ];
         };
         clientGroupsBlock = {

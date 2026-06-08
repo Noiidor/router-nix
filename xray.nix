@@ -51,6 +51,21 @@
             MTU = 1500;
           };
         }
+        {
+          protocol = "http";
+          tag = "http-in";
+          listen = "0.0.0.0";
+          port = 8118;
+          settings = {
+            users = [];
+            allowTransparent = true;
+          };
+          sniffing = {
+            enabled = true;
+            destOverride = ["http" "tls" "quic"];
+            routeOnly = true;
+          };
+        }
       ];
       outbounds = [
         {
