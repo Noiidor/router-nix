@@ -126,13 +126,15 @@
         domainStrategy = "IPIfNonMatch";
         rules = [
           {
+            # RU domains
             type = "field";
-            domain = ["*.ru"];
+            domain = ["domain:ru" "domain:рф" "domain:su"];
             outboundTag = "direct-out";
           }
           {
+            # Local domains
             type = "field";
-            domain = ["router.local" "localhost"];
+            domain = ["domain:router.local"];
             outboundTag = "direct-out";
           }
           {
